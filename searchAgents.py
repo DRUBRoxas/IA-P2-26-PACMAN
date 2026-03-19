@@ -146,6 +146,19 @@ class DoraLaExploradora(SearchAgent):
     def __init__(self):
         super().__init__(fn='exp')
 
+class DoraLaExploradoradfs(SearchAgent):
+    def __init__(self):
+        super().__init__(fn='dfs')
+
+class DoraLaExploradorabfs(SearchAgent):
+    def __init__(self):
+        super().__init__(fn='bfs')
+
+class DoraLaExploradorabae(SearchAgent):
+    def __init__(self):
+        # Le pasamos la manhattan ya creada por el proyecto
+        super().__init__(fn='astar', heuristic='manhattanHeuristic')
+
 class PositionSearchProblem(search.SearchProblem):
     """
     A search problem defines the state space, start state, goal test, successor

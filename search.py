@@ -91,17 +91,79 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    util.raiseNotDefined()
+    # Vamos a guardar tuplas de (estado,lista de acciones)
+    nodos_finales = util.Stack()
 
+    estado_inicial = problem.getStartState()
+    nodos_finales.push((estado_inicial,[]))
+
+    # Para evitar repetidos
+    casillas_visitadas = set()
+    movimientos_totales=0
+
+    while not nodos_finales.isEmpty():
+        # Sacamos el último elemento
+        estado_actual, acciones = nodos_finales.pop()
+
+        if problem.isGoalState(estado_actual):
+            print("--- DFS ---")
+            print("Número total de movimientos explorados: ", movimientos_totales)
+            print("Número de casillas únicas visitadas: ", len(casillas_visitadas))
+            ratio = movimientos_totales / len(casillas_visitadas) if len(casillas_visitadas) > 0 else 0
+            print("Ratio de repetición de casillas: {:.2f}".format(ratio))
+            print("Longitud del camino final encontrado:", len(acciones))
+            return acciones
+
+        if estado_actual not in casillas_visitadas:
+            casillas_visitadas.add(estado_actual)
+            sucesores = problem.getSuccessors(estado_actual)
+
+            for sucesor,accion,coste in sucesores:
+                if sucesor not in casillas_visitadas:
+                    #Creamos el nuevo camino añadiendo la acción actual
+                    movimientos_totales += 1
+                    camino_hijo=acciones + [accion]
+                    nodos_finales.push((sucesor,camino_hijo))
+    # Devolución de la pila vacía si no hay meta
+    return []
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Vamos a guardar tuplas de (estado,lista de acciones)
+    nodos_finales = util.Queue()
+
+    estado_inicial = problem.getStartState()
+    nodos_finales.push((estado_inicial,[]))
+
+    # Para evitar repetidos
+    casillas_visitadas = set()
+    movimientos_totales=0
+
+    while not nodos_finales.isEmpty():
+        # Sacamos el último elemento
+        estado_actual, acciones = nodos_finales.pop()
+
+        if problem.isGoalState(estado_actual):
+            print("--- DFS ---")
+            print("Número total de movimientos explorados: ", movimientos_totales)
+            print("Número de casillas únicas visitadas: ", len(casillas_visitadas))
+            ratio = movimientos_totales / len(casillas_visitadas) if len(casillas_visitadas) > 0 else 0
+            print("Ratio de repetición de casillas: {:.2f}".format(ratio))
+            print("Longitud del camino óptimo encontrado:", len(acciones))
+            return acciones
+
+        if estado_actual not in casillas_visitadas:
+            casillas_visitadas.add(estado_actual)
+            sucesores = problem.getSuccessors(estado_actual)
+
+            for sucesor,accion,coste in sucesores:
+                if sucesor not in casillas_visitadas:
+                    #Creamos el nuevo camino añadiendo la acción actual
+                    movimientos_totales += 1
+                    camino_hijo=acciones + [accion]
+                    nodos_finales.push((sucesor,camino_hijo))
+    # Devolución de la pila vacía si no hay meta
+    return []
 
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
@@ -120,8 +182,43 @@ def nullHeuristic(state, problem=None) -> float:
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Usamos cola de prioridad
+    nodos_finales = util.PriorityQueue()
+    estado_inicial = problem.getStartState()
+
+    prioridad_inicial= 0 + heuristic(estado_inicial,problem)
+    nodos_finales.push((estado_inicial,[],0),0+heuristic(estado_inicial,problem))
+
+    casillas_visitadas = set()
+    movimientos_totales = 0
+    while not nodos_finales.isEmpty():
+        estado_actual, acciones, coste = nodos_finales.pop()
+
+        #Si es meta, imprimimos
+        if problem.isGoalState(estado_actual):
+            print("--- A* ---")
+            print("Número total de movimientos explorados:", movimientos_totales)
+            print("Número de casillas únicas visitadas:", len(casillas_visitadas))
+            ratio = movimientos_totales / len(casillas_visitadas) if len(casillas_visitadas) > 0 else 0
+            print("Ratio de repetición de casillas: {:.2f}".format(ratio))
+            print("Longitud del camino óptimo encontrado:", len(acciones))
+            print("Coste real total del camino:", coste)
+            return acciones
+        if estado_actual not in casillas_visitadas:
+            casillas_visitadas.add(estado_actual)
+            sucesores = problem.getSuccessors(estado_actual)
+
+            for sucesor, accion, coste_sucesor in sucesores:
+                if sucesor not in casillas_visitadas:
+                    movimientos_totales += 1
+                    # Coste desde el inicial hasta el sucesor
+                    nuevo_coste = coste + coste_sucesor
+                    camino_hijo = acciones + [accion]
+                    # f(n) = g(n) + h(n)
+                    prioridad = nuevo_coste + heuristic(sucesor, problem)
+                    nodos_finales.push((sucesor, camino_hijo, nuevo_coste), prioridad)
+    return []
+
 
 
 def exploration(problem):
