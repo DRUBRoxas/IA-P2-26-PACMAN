@@ -110,6 +110,8 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
             print("Número total de movimientos explorados: ", movimientos_totales)
             print("Número de casillas únicas visitadas: ", len(casillas_visitadas))
             ratio = movimientos_totales / len(casillas_visitadas) if len(casillas_visitadas) > 0 else 0
+            eficiencia = (len(acciones) / len(casillas_visitadas)) * 100 if len(casillas_visitadas) > 0 else 0
+            print("Eficiencia del camino encontrado: {:.2f}%".format(eficiencia))
             print("Ratio de repetición de casillas: {:.2f}".format(ratio))
             print("Longitud del camino final encontrado:", len(acciones))
             return acciones
@@ -148,6 +150,8 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
             print("Número total de movimientos explorados: ", movimientos_totales)
             print("Número de casillas únicas visitadas: ", len(casillas_visitadas))
             ratio = movimientos_totales / len(casillas_visitadas) if len(casillas_visitadas) > 0 else 0
+            eficiencia = (len(acciones) / len(casillas_visitadas)) * 100 if len(casillas_visitadas) > 0 else 0
+            print("Eficiencia del camino encontrado: {:.2f}%".format(eficiencia))
             print("Ratio de repetición de casillas: {:.2f}".format(ratio))
             print("Longitud del camino óptimo encontrado:", len(acciones))
             return acciones
@@ -200,6 +204,8 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
             print("Número total de movimientos explorados:", movimientos_totales)
             print("Número de casillas únicas visitadas:", len(casillas_visitadas))
             ratio = movimientos_totales / len(casillas_visitadas) if len(casillas_visitadas) > 0 else 0
+            eficiencia = (len(acciones) / len(casillas_visitadas)) * 100 if len(casillas_visitadas) > 0 else 0
+            print("Eficiencia del camino encontrado: {:.2f}%".format(eficiencia))
             print("Ratio de repetición de casillas: {:.2f}".format(ratio))
             print("Longitud del camino óptimo encontrado:", len(acciones))
             print("Coste real total del camino:", coste)
