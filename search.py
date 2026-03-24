@@ -187,7 +187,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
     estado_inicial = problem.getStartState()
 
     prioridad_inicial= 0 + heuristic(estado_inicial,problem)
-    nodos_finales.push((estado_inicial,[],0),0+heuristic(estado_inicial,problem))
+    nodos_finales.push((estado_inicial,[],0),prioridad_inicial)
 
     casillas_visitadas = set()
     movimientos_totales = 0
@@ -207,7 +207,6 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
         if estado_actual not in casillas_visitadas:
             casillas_visitadas.add(estado_actual)
             sucesores = problem.getSuccessors(estado_actual)
-
             for sucesor, accion, coste_sucesor in sucesores:
                 if sucesor not in casillas_visitadas:
                     movimientos_totales += 1
