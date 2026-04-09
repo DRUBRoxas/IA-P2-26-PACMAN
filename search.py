@@ -172,9 +172,30 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    frontera = util.PriorityQueue()
+    estado_inicial = problem.getStartState()
 
+    # Cada nodo: (estado, acciones_desde_inicio, coste_acumulado)
+    frontera.push((estado_inicial, [], 0), 0)
+    mejor_coste = {estado_inicial: 0}
+
+    while not frontera.isEmpty():
+        estado_actual, acciones, coste_actual = frontera.pop()
+
+        # Si este nodo ya no es el mejor conocido para su estado, lo ignoramos.
+        if coste_actual > mejor_coste.get(estado_actual, float('inf')):
+            continue
+
+        if problem.isGoalState(estado_actual):
+            return acciones
+
+        for sucesor, accion, coste_paso in problem.getSuccessors(estado_actual):
+            nuevo_coste = coste_actual + coste_paso
+            if nuevo_coste < mejor_coste.get(sucesor, float('inf')):
+                mejor_coste[sucesor] = nuevo_coste
+                frontera.push((sucesor, acciones + [accion], nuevo_coste), nuevo_coste)
+
+    return []
 
 def nullHeuristic(state, problem=None) -> float:
     """
@@ -273,7 +294,88 @@ def exploration(problem):
     print("Ratio de repetición de casillas:", len(pilaTotal) / len(casillas_visitadas) if len(casillas_visitadas) > 0 else float('inf'))
 
     return pilaTotal
-# Abbreviations
+
+
+def greedySearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
+    """Busca el nodo con el menor valor heurísitco."""
+    frontera = util.PriorityQueue()
+    estado_inicial = problem.getStartState()
+
+    # En Greedy, la prioridad inicial es exclusivamente el valor heurístico h(n)
+    prioridad_inicial = heuristic(estado_inicial, problem)
+
+    frontera.push((estado_inicial, []), prioridad_inicial)
+
+    casillas_visitadas = set()
+    movimientos_totales = 0
+
+    while not frontera.isEmpty():
+        estado_actual, acciones = frontera.pop()
+
+        if problem.isGoalState(estado_actual):
+            print("--- Greedy Best-First Search ---")
+            print("Número total de movimientos explorados:", movimientos_totales)
+            print("Número de casillas únicas visitadas:", len(casillas_visitadas))
+            ratio = movimientos_totales / len(casillas_visitadas) if len(casillas_visitadas) > 0 else 0
+            eficiencia = (len(acciones) / len(casillas_visitadas)) * 100 if len(casillas_visitadas) > 0 else 0
+            print("Eficiencia del camino encontrado: {:.2f}%".format(eficiencia))
+            print("Ratio de repetición de casillas: {:.2f}".format(ratio))
+            print("Longitud del camino encontrado:", len(acciones))
+            # Nota: Greedy no garantiza el camino óptimo, por eso decimos "camino encontrado"
+            return acciones
+
+        if estado_actual not in casillas_visitadas:
+            casillas_visitadas.add(estado_actual)
+            sucesores = problem.getSuccessors(estado_actual)
+
+            for sucesor, accion, coste_sucesor in sucesores:
+                if sucesor not in casillas_visitadas:
+                    movimientos_totales += 1
+                    camino_hijo = acciones + [accion]
+                    # f(n) = h(n)
+                    prioridad = heuristic(sucesor, problem)
+                    frontera.push((sucesor, camino_hijo), prioridad)
+
+    return []
+
+
+def iterativeDeepeningSearch(problem: SearchProblem) -> List[Directions]:
+    """
+    Busca los nodos mas profundos con una profundiad limitada, incrementando el limite hasta encontrar la meta. Es una combinación de DFS y BFS.
+    """
+    def depthLimitedSearch(limit: int) -> List[Directions]:
+        frontera = util.Stack()
+        frontera.push((problem.getStartState(), []))
+
+        visitados = {}
+
+        while not frontera.isEmpty():
+            estado_actual, acciones = frontera.pop()
+            profundidad_actual = len(acciones)
+            if problem.isGoalState(estado_actual):
+                return acciones
+            # Comprobamos si el estado ya fue visitado en una profundidad menor o igual
+            if estado_actual in visitados and visitados[estado_actual] <= profundidad_actual:
+                continue
+            visitados[estado_actual] = profundidad_actual
+            if profundidad_actual < limit:
+                for sucesor, accion, coste in problem.getSuccessors(estado_actual):
+                    camino_hijo = acciones + [accion]
+                    frontera.push((sucesor, camino_hijo))
+
+        return None
+    # Bucle principal de IDDFS
+    limite_profundidad = 0
+    while True:
+        resultado = depthLimitedSearch(limite_profundidad)
+        if resultado is not None:  # Se encontró la meta
+            return resultado
+        limite_profundidad += 1
+
+
+# Abreviaciones
+iddfs = iterativeDeepeningSearch
+greedy=greedySearch
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
